@@ -999,8 +999,8 @@ class VideoSurprise {
   // The site "opens" at this moment (IST). Before it, tapping "Begin" shows
   // the lock-message instead of advancing. Uses an explicit +05:30 offset
   // so it unlocks at the right time regardless of the visitor's own
-  // device timezone.
-  const UNLOCK_AT = new Date('2026-08-18T00:00:00+05:30').getTime();
+  // device timezone.   
+  const UNLOCK_AT = new Date('2026-08-18T00:00:00+05:30').getTime(); //time in milliseconds
   const isLocked = () => Date.now() < UNLOCK_AT;
 
   const lockMessageEl = document.getElementById('lock-message');
