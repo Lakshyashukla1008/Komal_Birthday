@@ -991,7 +991,7 @@ class VideoSurprise {
 }
 
 /* =====================================================================
-   APP BOOTSTRAP
+   APP BOOTSTRAPh
    ===================================================================== */
 (function initApp() {
   const appEl = document.getElementById('app');
@@ -1000,7 +1000,7 @@ class VideoSurprise {
   // the lock-message instead of advancing. Uses an explicit +05:30 offset
   // so it unlocks at the right time regardless of the visitor's own
   // device timezone.
-  const UNLOCK_AT = new Date('2026-08-18T00:00:00+05:30').getTime();
+  const UNLOCK_AT = new Date('2026-08-16T00:00:00+05:30').getTime();
   const isLocked = () => Date.now() < UNLOCK_AT;
 
   const lockMessageEl = document.getElementById('lock-message');
