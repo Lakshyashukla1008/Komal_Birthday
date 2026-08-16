@@ -1,0 +1,817 @@
+/* =====================================================================
+   BIRTHDAY WEBSITE — STYLESHEET
+   Dark luxury / cinematic theme.
+   Palette: deep black + dark purple base, gold + pink + purple + white
+   accents. Every animation favours CSS transforms/opacity so the
+   compositor (not layout) does the work → smooth on mobile.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   0. DESIGN TOKENS
+   --------------------------------------------------------------------- */
+:root {
+  /* Base */
+  --c-black:        #05030a;
+  --c-black-soft:   #0c0716;
+  --c-purple-deep:  #1c0f33;
+  --c-purple-mid:   #33184f;
+
+  /* Accents */
+  --c-gold:         #e8c069;
+  --c-gold-soft:    #f5dfa3;
+  --c-pink:         #ff6fa0;
+  --c-pink-soft:    #ffa8c6;
+  --c-purple:       #9b5de5;
+  --c-purple-bright:#c084fc;
+  --c-white:        #f7f2ff;
+
+  /* Fonts */
+  --font-display: 'Cormorant Garamond', 'Marcellus', serif;
+  --font-accent:  'Marcellus', serif;
+  --font-body:    'Manrope', sans-serif;
+
+  /* Timing */
+  --ease-cinema: cubic-bezier(0.16, 1, 0.3, 1);
+  --fade-duration: 900ms;
+}
+
+/* ---------------------------------------------------------------------
+   1. RESET / BASE
+   --------------------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* single-screen experience, no scroll */
+  background: var(--c-black);
+  color: var(--c-white);
+  font-family: var(--font-body);
+}
+
+#app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, var(--c-purple-deep) 0%, var(--c-black) 70%);
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+/* Respect reduced-motion preference: cut ambient loops, keep core reveals */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   2. SCENE MANAGEMENT (cross-fade)
+   --------------------------------------------------------------------- */
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--fade-duration) var(--ease-cinema);
+  overflow: hidden;
+}
+
+.scene.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* =====================================================================
+   SCENE 1 — WELCOME
+   ===================================================================== */
+#scene-welcome {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(155, 93, 229, 0.25), transparent 60%),
+    linear-gradient(180deg, var(--c-black-soft) 0%, var(--c-black) 60%, #000 100%);
+}
+
+/* Soft moving gradient "glow" blobs — pure CSS, GPU-only */
+.ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.ambient-glow--a {
+  width: 70vmax;
+  height: 70vmax;
+  left: -20vmax;
+  top: -10vmax;
+  background: radial-gradient(circle, var(--c-purple) 0%, transparent 70%);
+  animation: driftA 22s ease-in-out infinite;
+}
+
+.ambient-glow--b {
+  width: 60vmax;
+  height: 60vmax;
+  right: -20vmax;
+  bottom: -15vmax;
+  background: radial-gradient(circle, var(--c-pink) 0%, transparent 70%);
+  animation: driftB 26s ease-in-out infinite;
+}
+
+@keyframes driftA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(6vmax, 8vmax) scale(1.15); }
+}
+
+@keyframes driftB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-5vmax, -6vmax) scale(1.1); }
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 8vw;
+  animation: contentRiseIn 1.6s var(--ease-cinema) both;
+}
+
+@keyframes contentRiseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-size: clamp(0.6rem, 2.4vw, 0.8rem);
+  color: var(--c-gold-soft);
+  opacity: 0.85;
+  margin-bottom: 1.1rem;
+}
+
+.welcome-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 11vw, 4.2rem);
+  line-height: 1.1;
+  background: linear-gradient(100deg, var(--c-white) 0%, var(--c-gold-soft) 45%, var(--c-pink-soft) 75%, var(--c-white) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+  text-shadow: 0 0 40px rgba(232, 192, 105, 0.25);
+}
+
+.welcome-sub {
+  margin-top: 0.9rem;
+  font-size: clamp(0.95rem, 3vw, 1.15rem);
+  color: var(--c-white);
+  opacity: 0.8;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.ellipsis { opacity: 0.6; }
+
+.welcome-heart {
+  margin-top: 1.4rem;
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+  animation: heartbeat 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 111, 160, 0.6));
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15%      { transform: scale(1.18); }
+  30%      { transform: scale(1); }
+  45%      { transform: scale(1.12); }
+  60%      { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  to { background-position: -200% center; }
+}
+
+/* Glowing "Tap Anywhere To Begin" button */
+.begin-btn {
+  position: relative;
+  margin-top: 3rem;
+  padding: 0.95rem 2.1rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(0.8rem, 2.6vw, 0.95rem);
+  letter-spacing: 0.06em;
+  color: var(--c-black);
+  background: linear-gradient(120deg, var(--c-gold) 0%, var(--c-gold-soft) 50%, var(--c-pink-soft) 100%);
+  box-shadow:
+    0 0 20px rgba(232, 192, 105, 0.55),
+    0 0 60px rgba(155, 93, 229, 0.35);
+  animation: btnPulse 2.4s ease-in-out infinite;
+  overflow: hidden;
+}
+
+.begin-btn-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 192, 105, 0.45);
+  animation: ringPulse 2.4s ease-in-out infinite;
+}
+
+.begin-btn-label { position: relative; z-index: 1; }
+
+@keyframes btnPulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 20px rgba(232,192,105,0.55), 0 0 60px rgba(155,93,229,0.35); }
+  50%      { transform: scale(1.045); box-shadow: 0 0 34px rgba(232,192,105,0.8), 0 0 90px rgba(155,93,229,0.55); }
+}
+
+@keyframes ringPulse {
+  0%   { transform: scale(1);   opacity: 0.9; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Fades the whole welcome scene content out right after the tap, before
+   the countdown scene fades in (handled by adding this class in JS). */
+#scene-welcome.is-leaving .welcome-content {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+  transition: opacity 500ms var(--ease-cinema), transform 500ms var(--ease-cinema);
+}
+
+/* "Not yet" lock overlay — shown if tapped before the unlock date/time. */
+.lock-message {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 10vw;
+  background: rgba(5, 3, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms var(--ease-cinema);
+}
+
+.lock-message.is-visible {
+  opacity: 1;
+}
+
+.lock-emoji {
+  font-size: clamp(2.6rem, 11vw, 3.8rem);
+  margin-bottom: 1.1rem;
+  filter: drop-shadow(0 0 22px rgba(232, 192, 105, 0.6));
+}
+
+.lock-message.is-visible .lock-emoji {
+  animation: lockEmojiPop 700ms var(--ease-cinema);
+}
+
+.lock-text {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(0.95rem, 3.6vw, 1.15rem);
+  line-height: 1.7;
+  color: var(--c-white);
+}
+
+.lock-text strong {
+  color: var(--c-gold-soft);
+  font-weight: 600;
+}
+
+@keyframes lockEmojiPop {
+  0%   { opacity: 0; transform: scale(0.3) rotate(-14deg); }
+  60%  { opacity: 1; transform: scale(1.15) rotate(5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* =====================================================================
+   SCENE 2 — COUNTDOWN
+   ===================================================================== */
+#scene-countdown {
+  background: radial-gradient(circle at 50% 50%, var(--c-purple-deep) 0%, var(--c-black) 75%);
+}
+
+.countdown-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-number {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(7rem, 42vw, 16rem);
+  line-height: 1;
+  color: var(--c-white);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Each beat: zoom in + glow + pulse, then the beat's "hold" class keeps a
+   slow breathing pulse until script.js swaps in the next number. */
+.countdown-number.is-beat {
+  animation: countBeatIn 550ms var(--ease-cinema) forwards;
+}
+
+.countdown-number.is-holding {
+  animation: countHold 900ms ease-in-out infinite;
+}
+
+.countdown-number.is-out {
+  animation: countBeatOut 320ms ease-in forwards;
+}
+
+@keyframes countBeatIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+    text-shadow: 0 0 0 rgba(232, 192, 105, 0);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.25);
+    text-shadow:
+      0 0 40px rgba(232, 192, 105, 0.9),
+      0 0 90px rgba(255, 111, 160, 0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    text-shadow:
+      0 0 30px rgba(232, 192, 105, 0.85),
+      0 0 70px rgba(155, 93, 229, 0.6);
+  }
+}
+
+@keyframes countHold {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow: 0 0 30px rgba(232, 192, 105, 0.85), 0 0 70px rgba(155, 93, 229, 0.6);
+  }
+  50% {
+    transform: scale(1.06);
+    text-shadow: 0 0 46px rgba(232, 192, 105, 1), 0 0 100px rgba(255, 111, 160, 0.75);
+  }
+}
+
+@keyframes countBeatOut {
+  to { opacity: 0; transform: scale(1.6); filter: blur(4px); }
+}
+
+/* Screen shake applied to #app on every beat */
+#app.is-shaking {
+  animation: screenShake 260ms ease-in-out;
+}
+
+@keyframes screenShake {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-6px, 3px); }
+  40%  { transform: translate(5px, -4px); }
+  60%  { transform: translate(-4px, 4px); }
+  80%  { transform: translate(3px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Reusable full-screen flash (per-beat quick flash + the big finale flash) */
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--c-white);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.flash-overlay.is-flashing {
+  animation: quickFlash 260ms ease-out;
+}
+
+.flash-overlay.is-flashing-big {
+  animation: bigFlash 900ms ease-out forwards;
+}
+
+@keyframes quickFlash {
+  0%   { opacity: 0; }
+  15%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+@keyframes bigFlash {
+  0%   { opacity: 0; }
+  25%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* =====================================================================
+   SCENE 3 — GRAND REVEAL
+   ===================================================================== */
+#scene-reveal {
+  background: radial-gradient(circle at 50% 40%, #24123f 0%, var(--c-black) 70%);
+}
+
+#fireworks-canvas { z-index: 2; }
+#confetti-canvas  { z-index: 4; }
+
+.light-rays {
+  position: absolute;
+  inset: -20%;
+  z-index: 1;
+  background: conic-gradient(
+    from 0deg,
+    rgba(232, 192, 105, 0.16) 0deg,
+    transparent 18deg,
+    transparent 40deg,
+    rgba(155, 93, 229, 0.14) 55deg,
+    transparent 75deg,
+    transparent 100deg,
+    rgba(255, 111, 160, 0.12) 115deg,
+    transparent 135deg,
+    transparent 200deg,
+    rgba(232, 192, 105, 0.14) 220deg,
+    transparent 240deg,
+    transparent 320deg,
+    rgba(155, 93, 229, 0.12) 340deg,
+    transparent 360deg
+  );
+  mix-blend-mode: screen;
+  animation: raySpin 40s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes raySpin {
+  to { transform: rotate(360deg); }
+}
+
+.balloons-layer,
+.sparkles-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Individual balloon — generated by JS, animated with CSS custom props
+   for per-balloon drift/duration/delay so no per-frame JS is needed. */
+.balloon {
+  position: absolute;
+  bottom: -20vh;
+  left: var(--x, 50%);
+  width: var(--size, 46px);
+  height: calc(var(--size, 46px) * 1.25);
+  border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+  background: radial-gradient(circle at 32% 28%, var(--balloon-light), var(--balloon-dark) 75%);
+  box-shadow: inset -6px -8px 12px rgba(0,0,0,0.25), 0 0 18px rgba(0,0,0,0.15);
+  opacity: 0.95;
+  animation: balloonRise var(--duration, 14s) linear var(--delay, 0s) infinite;
+}
+
+.balloon::after {
+  /* string */
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.balloon::before {
+  /* knot */
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--balloon-dark);
+  transform: translateX(-50%);
+}
+
+@keyframes balloonRise {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(3vw, -30vh) rotate(4deg); }
+  50%  { transform: translate(-2vw, -60vh) rotate(-4deg); }
+  75%  { transform: translate(3vw, -90vh) rotate(3deg); }
+  100% { transform: translate(0, -125vh) rotate(0deg); }
+}
+
+/* Sparkle particles — small glowing dots that twinkle in place */
+.sparkle {
+  position: absolute;
+  top: var(--y, 50%);
+  left: var(--x, 50%);
+  width: var(--size, 4px);
+  height: var(--size, 4px);
+  border-radius: 50%;
+  background: var(--sparkle-color, var(--c-gold-soft));
+  box-shadow: 0 0 8px 2px var(--sparkle-color, var(--c-gold-soft));
+  animation: sparkleTwinkle var(--duration, 3s) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50%      { opacity: 1; transform: scale(1.2); }
+}
+
+.reveal-content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 6vw;
+}
+
+.reveal-emoji {
+  font-size: clamp(2.2rem, 9vw, 3.4rem);
+  margin-bottom: 0.4rem;
+  animation: emojiPop 900ms var(--ease-cinema) 200ms both, emojiFloat 3.2s ease-in-out 1.1s infinite;
+}
+
+@keyframes emojiPop {
+  0%   { opacity: 0; transform: scale(0) rotate(-20deg); }
+  70%  { opacity: 1; transform: scale(1.2) rotate(6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes emojiFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+.reveal-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 0.98;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+}
+
+.reveal-line {
+  opacity: 0;
+  display: inline-block;
+  transform: translateY(30px) scale(0.9);
+  background: linear-gradient(100deg, var(--c-gold-soft) 0%, var(--c-white) 30%, var(--c-pink-soft) 60%, var(--c-gold-soft) 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.reveal-line--happy {
+  font-size: clamp(2.4rem, 12vw, 5rem);
+  letter-spacing: 0.05em;
+  animation:
+    lineRiseIn 900ms var(--ease-cinema) 300ms forwards,
+    titleShimmer 5s linear 1.2s infinite;
+}
+
+.reveal-line--birthday {
+  font-size: clamp(3.1rem, 15vw, 6.4rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  animation:
+    lineRiseIn 900ms var(--ease-cinema) 550ms forwards,
+    titleShimmer 5s linear 1.4s infinite,
+    titleGlowPulse 3.4s ease-in-out 1.6s infinite;
+}
+
+.reveal-line--name {
+  font-size: clamp(2.6rem, 13vw, 5.4rem);
+  letter-spacing: 0.08em;
+  animation: lineRiseIn 900ms var(--ease-cinema) 800ms forwards, titleShimmer 5s linear 1.6s infinite;
+}
+
+@keyframes lineRiseIn {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes titleShimmer {
+  to { background-position: -250% center; }
+}
+
+@keyframes titleGlowPulse {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(232, 192, 105, 0.55)); }
+  50%      { filter: drop-shadow(0 0 42px rgba(255, 111, 160, 0.75)); }
+}
+
+.reveal-heart {
+  margin-top: 1.1rem;
+  font-size: clamp(1.5rem, 6vw, 2.1rem);
+  opacity: 0;
+  animation:
+    lineRiseIn 700ms var(--ease-cinema) 1050ms forwards,
+    heartbeat 2.6s ease-in-out 1.8s infinite;
+  filter: drop-shadow(0 0 14px rgba(255, 111, 160, 0.65));
+}
+
+/* Button below the reveal heart that opens the surprise video */
+.video-trigger-btn {
+  position: relative;
+  margin-top: 2rem;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(0.85rem, 2.8vw, 1rem);
+  letter-spacing: 0.03em;
+  color: var(--c-white);
+  background: rgba(155, 93, 229, 0.16);
+  border: 1px solid rgba(232, 192, 105, 0.5);
+  box-shadow: 0 0 22px rgba(155, 93, 229, 0.35);
+  opacity: 0;
+  animation:
+    lineRiseIn 700ms var(--ease-cinema) 1300ms forwards,
+    videoBtnPulse 2.6s ease-in-out 2.1s infinite;
+}
+
+.video-trigger-emoji {
+  font-size: 1.15em;
+}
+
+@keyframes videoBtnPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 22px rgba(155, 93, 229, 0.35); }
+  50%      { transform: scale(1.05); box-shadow: 0 0 34px rgba(232, 192, 105, 0.55); }
+}
+
+/* ---------------------------------------------------------------------
+   VIDEO MODAL — the surprise video, opened from Scene 3
+   --------------------------------------------------------------------- */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6vh 5vw;
+  background: rgba(4, 2, 8, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 400ms var(--ease-cinema), visibility 400ms;
+}
+
+.video-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.video-modal-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: min(92vw, 420px);
+  transform: scale(0.92);
+  opacity: 0;
+  transition: transform 450ms var(--ease-cinema), opacity 450ms var(--ease-cinema);
+}
+
+.video-modal.is-open .video-modal-inner {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.surprise-video {
+  width: 100%;
+  max-height: 72vh;
+  border-radius: 18px;
+  background: #000;
+  box-shadow:
+    0 0 0 1px rgba(232, 192, 105, 0.4),
+    0 0 50px rgba(155, 93, 229, 0.45),
+    0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.video-close-btn {
+  position: absolute;
+  top: max(3vh, 16px);
+  right: max(4vw, 16px);
+  z-index: 101;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-white);
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.video-end-caption {
+  margin-top: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 500ms var(--ease-cinema), transform 500ms var(--ease-cinema);
+}
+
+.video-end-caption.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.video-end-emoji {
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  filter: drop-shadow(0 0 16px rgba(232, 192, 105, 0.6));
+}
+
+.video-end-caption.is-visible .video-end-emoji {
+  animation: lockEmojiPop 700ms var(--ease-cinema);
+}
+
+.video-end-text {
+  margin-top: 0.4rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 6vw, 1.9rem);
+  background: linear-gradient(100deg, var(--c-gold-soft) 0%, var(--c-white) 40%, var(--c-pink-soft) 75%, var(--c-gold-soft) 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: titleShimmer 5s linear infinite;
+}
+
+/* ---------------------------------------------------------------------
+   3. RESPONSIVE ADJUSTMENTS
+   --------------------------------------------------------------------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .welcome-name   { font-size: clamp(1.8rem, 7vw, 3rem); }
+  .countdown-number { font-size: clamp(5rem, 26vw, 10rem); }
+  .reveal-line--birthday { font-size: clamp(2.2rem, 10vw, 4rem); }
+  .reveal-line--happy,
+  .reveal-line--name { font-size: clamp(1.8rem, 7vw, 3rem); }
+  .begin-btn { margin-top: 1.6rem; }
+}
+
+@media (min-width: 900px) {
+  .welcome-content, .reveal-content { max-width: 720px; }
+}
